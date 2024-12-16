@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -9,7 +9,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ieuriuywgs9orihzwiesytrgher0uth0feir'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['UPLOAD_FOLDER'] = 'static/images'
+app.config['UPLOAD_FOLDER'] = 'images'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -49,7 +49,7 @@ def index():
         return redirect(url_for('login'))
     
     current_season = get_current_season()
-    images_root = 'static/images'
+    images_root = 'images'
     
     print(f"Looking for images in: {images_root}")
     print(f"Directory exists: {os.path.exists(images_root)}")
@@ -86,8 +86,15 @@ def index():
     
     print(f"Total available images: {len(available_images)}")
 
-    random_image = random.choice(available_images)
+    # Check if there are any available images
+    if not available_images:
+        flash('No images available')
+        return render_template('index.html', 
+                             image=None,
+                             user=current_user,
+                             season=current_season)
 
+    random_image = random.choice(available_images)
     current_user.add_viewed_image(random_image.id)
     db.session.commit()
     
@@ -148,10 +155,10 @@ def register():
 @app.route('/battlepass')
 @login_required
 def battlepass():
-    print(f"User level: {current_user.battle_pass_level}")  # Debug user level
+    print(f"User level: {current_user.battle_pass_level}")
     
     current_season = get_current_season()
-    images_root = 'static/images'
+    images_root = 'images'
     
     # Calculate user's progress
     viewed_count = len(set(filter(None, current_user.viewed_images.split(','))))
@@ -173,15 +180,12 @@ def battlepass():
                     image = Image(
                         filename=filename,
                         season=battlepass_folder,
-                        required_level=len(battlepass_images) + 1  # Increment level requirement
+                        required_level=len(battlepass_images) + 1
                     )
                     db.session.add(image)
                     db.session.commit()
                 
                 battlepass_images.append(image)
-    
-    for image in battlepass_images:
-        print(f"Image: {image.filename}, Required level: {image.required_level}")  # Debug image levels
     
     return render_template('battlepass.html', 
                          battlepass_images=battlepass_images,
@@ -195,7 +199,7 @@ def admin():
     if not current_user.is_admin:
         return "Access denied", 403
     
-    images_root = 'static/images'  # Changed from 'images' to 'static/images'
+    images_root = 'images'
     
     # Get seasons from folder structure
     seasons = []
@@ -307,6 +311,10 @@ def unlock_image(image_id):
         db.session.commit()
         return jsonify({'success': True})
     return jsonify({'success': False, 'message': 'Not enough tokens'})
+
+@app.route('/images/<path:filename>')
+def serve_image(filename):
+    return send_from_directory('images', filename)
 
 if __name__ == '__main__':
     with app.app_context():

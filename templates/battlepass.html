@@ -1,99 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="battlepass-container">
-    <h2>Battle Pass - {{ season }}</h2>
+<div class="container">
+    <h1>Battle Pass - {{ season }}</h1>
+    <p>Your Level: {{ user.battle_pass_level }}</p>
     <p>Your Tokens: {{ user.tokens }}</p>
     
-    <div class="rewards-container">
+    <div class="battlepass-grid">
         {% for image in battlepass_images %}
-        <div class="reward-item">
-            <div class="image-container">
+            <div class="battlepass-item">
                 {% if user.has_viewed_image(image.id) %}
-                    <img class="reward-image" src="{{ url_for('static', filename='images/' + image.season + '/' + image.filename) }}" 
-                         alt="Battle Pass Reward">
+                    <!-- Show the unlocked image -->
+                    <img src="/images/{{ image.season }}/{{ image.filename }}" 
+                         alt="Battle Pass Image"
+                         class="battlepass-image">
                 {% else %}
-                    <div class="locked-content">
-                        <h3>Reward {{ loop.index }}</h3>
-                    </div>
-                {% endif %}
-            </div>
-            {% if not user.has_viewed_image(image.id) %}
-                {% if user.tokens >= 5 %}
-                    <button class="unlock-button" onclick="unlockImage({{ image.id }})">
-                        Unlock (5 tokens)
+                    <!-- Show unlock button -->
+                    <button class="unlock-button" 
+                            data-image-id="{{ image.id }}"
+                            onclick="unlockImage({{ image.id }})">
+                        Unlock Image (10 tokens)
                     </button>
-                {% else %}
-                    <div class="insufficient-tokens">
-                        Need 5 tokens
-                    </div>
                 {% endif %}
-            {% endif %}
-        </div>
+                <p>Level Required: {{ image.required_level }}</p>
+            </div>
         {% endfor %}
     </div>
 </div>
-
-<style>
-.battlepass-container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.rewards-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    padding: 20px 0;
-}
-
-.reward-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.image-container {
-    width: 100%;
-    aspect-ratio: 1;
-    background: #2a2a2a;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.locked-content {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    text-align: center;
-}
-
-.reward-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.unlock-button {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-}
-
-.insufficient-tokens {
-    color: #ff4444;
-    text-align: center;
-    width: 100%;
-}
-</style>
 
 <script>
 function unlockImage(imageId) {
@@ -101,11 +34,52 @@ function unlockImage(imageId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Reload the page to show the newly unlocked image
                 location.reload();
             } else {
-                alert('Failed to unlock: ' + data.message);
+                alert('Not enough tokens to unlock this image!');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while trying to unlock the image.');
         });
 }
 </script>
+
+<style>
+.battlepass-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.battlepass-item {
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.battlepass-image {
+    max-width: 100%;
+    height: auto;
+}
+
+.unlock-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.unlock-button:hover {
+    background-color: #45a049;
+}
+</style>
 {% endblock %}
