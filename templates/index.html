@@ -3,25 +3,10 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="user-stats">
-    <div class="stat-card">
-        <div class="stat-value">{{ user.battle_pass_level }}</div>
-        <div>Battle Pass Level</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">{{ user.experience_points }}/100</div>
-        <div>Experience Points</div>
-    </div>
-</div>
-
 <div class="card">
     {% if image %}
     <div class="image-display">
-        <img src="{{ url_for('static', filename='images/' + season + '/' + image.filename) }}" alt="Season Image">
-    </div>
-    <div style="text-align: center;">
-        <p>Current Season: {{ season }}</p>
-        <a href="{{ url_for('gain_experience') }}" class="btn">Gain Experience</a>
+        <img src="{{ url_for('serve_image', filename=image.season + '/' + image.filename) }}" alt="Season Image">
     </div>
     {% endif %}
 </div>

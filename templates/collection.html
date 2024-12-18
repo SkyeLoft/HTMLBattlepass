@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="collection-container">
+    <h1>Your Collection</h1>
+    <p>Images you've discovered: {{ viewed_images|length }}</p>
+    
+    <div class="collection-grid">
+        {% for image in viewed_images %}
+        <div class="collection-item" onclick="openModal('{{ url_for('serve_image', filename=image.season + '/' + image.filename) }}')">
+            <img src="{{ url_for('serve_image', filename=image.season + '/' + image.filename) }}" 
+                 alt="{{ image.season }}"
+                 loading="lazy">
+            <div class="image-info">
+                <span class="season-tag">{{ image.season }}</span>
+            </div>
+        </div>
+        {% else %}
+        <p class="no-images">You haven't discovered any images yet!</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="imageModal" class="modal">
+    <span class="close-button" onclick="closeModal()">&times;</span>
+    <img id="modalImage" class="modal-content" src="" alt="Full size image">
+</div>
+
+<style>
+.collection-container {
+    padding: 20px;
+}
+
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.collection-item {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.collection-item:hover {
+    transform: scale(1.05);
+}
+
+.collection-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.image-info {
+    padding: 10px;
+    text-align: center;
+}
+
+.season-tag {
+    background: #3498db;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    display: inline-block;
+}
+
+.no-images {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding: 20px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    overflow: auto;
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+}
+
+.close-button {
+    position: fixed;
+    right: 35px;
+    top: 15px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #bbb;
+}
+
+@keyframes zoom {
+    from {transform: scale(0)}
+    to {transform: scale(1)}
+}
+
+.modal-content {
+    animation-name: zoom;
+    animation-duration: 0.3s;
+}
+</style>
+
+<script>
+function openModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modal.style.display = "block";
+    modalImg.src = imageSrc;
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = "none";
+}
+
+// Close modal when clicking outside the image
+document.getElementById('imageModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Close modal with escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>
+{% endblock %} 
