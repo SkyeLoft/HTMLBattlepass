@@ -11,19 +11,19 @@ services:
     depends_on:
       - db
     volumes:
-      - ./images:/app/images:rw
-      - ./static:/app/static:rw
-      - ./logs:/app/logs:rw
+      - ./images:/app/images
+      - ./static:/app/static
+      - ./logs:/app/logs
 
   db:
     image: postgres:13-alpine
     restart: always
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
-      - db_data:/var/lib/postgresql/data:rw
+      - ./data/postgres:/var/lib/postgresql/data
 
   nginx:
     image: nginx:alpine
@@ -32,13 +32,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./static:/static:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./static:/static
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
     depends_on:
       - web
-
-volumes:
-  db_data:
-    driver: local
