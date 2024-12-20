@@ -6,14 +6,32 @@ import os
 import random
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ieuriuywgs9orihzwiesytrgher0uth0feir'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['UPLOAD_FOLDER'] = 'images'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+csrf = CSRFProtect(app)
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+Talisman(app, 
+    content_security_policy={
+        'default-src': "'self'",
+        'img-src': "'self' data:",
+        'script-src': "'self' 'unsafe-inline'"
+    }
+)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
