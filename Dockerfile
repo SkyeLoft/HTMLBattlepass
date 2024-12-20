@@ -21,5 +21,5 @@ ENV FLASK_APP=index.py
 # Expose port
 EXPOSE 5000
 
-# Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "index:app"]
+# Run gunicorn with explicit path
+CMD ["/usr/local/bin/gunicorn", "--bind", "0.0.0.0:5000", "index:app"]
