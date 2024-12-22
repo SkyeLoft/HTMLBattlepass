@@ -5,6 +5,8 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    netcat-openbsd \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -18,8 +20,15 @@ COPY . .
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=index.py
 
+# Add health check endpoint
+RUN echo 'from flask import Flask\n\
+app = Flask(__name__)\n\
+@app.route("/health")\n\
+def health():\n\
+    return "OK"' >> health.py
+
 # Expose port
 EXPOSE 5000
 
-# Run gunicorn with explicit path
-CMD ["/usr/local/bin/gunicorn", "--bind", "0.0.0.0:5000", "index:app"]
+# Run with wait-for script
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "index:app"]
