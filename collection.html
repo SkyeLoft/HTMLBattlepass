@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection</title>
+    <style>
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .gallery img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery" id="imageGallery"></div>
+
+    <script>
+        const viewedImages = JSON.parse(localStorage.getItem('viewedImages')) || [];
+
+        function displayCollection() {
+            const gallery = document.getElementById('imageGallery');
+            viewedImages.forEach(imagePath => {
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = 'Collection Image';
+                gallery.appendChild(img);
+            });
+        }
+
+        displayCollection();
+    </script>
+</body>
+</html> 

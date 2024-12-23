@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Pass</title>
+    <style>
+        .battlepass-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .battlepass-item {
+            position: relative;
+            text-align: center;
+        }
+        .locked {
+            filter: blur(10px);
+        }
+        .unlock-button {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+    <script src="scan_images.js"></script>
+</head>
+<body>
+    <div id="tokens">Tokens: <span id="tokenCount">0</span></div>
+    <div class="battlepass-container" id="battlepassContent"></div>
+
+    <script>
+        let battlepassImages = {};
+        let tokens = parseInt(localStorage.getItem('tokens')) || 0;
+        let viewedImages = JSON.parse(localStorage.getItem('viewedImages')) || [];
+
+        // Load images by scanning
+        getOrScanImages()
+            .then(data => {
+                // Filter for battlepass folders only
+                battlepassImages = Object.fromEntries(
+                    Object.entries(data).filter(([key]) => key.endsWith('_battlepass'))
+                );
+                // Initialize after loading image data
+                displayBattlepass();
+            })
+            .catch(error => console.error('Error loading images:', error));
+
+        function updateTokenDisplay() {
+            document.getElementById('tokenCount').textContent = tokens;
+        }
+
+        function unlockImage(imagePath) {
+            if (tokens >= 1) {
+                tokens--;
+                viewedImages.push(imagePath);
+                localStorage.setItem('tokens', tokens);
+                localStorage.setItem('viewedImages', JSON.stringify(viewedImages));
+                updateTokenDisplay();
+                displayBattlepass();
+            } else {
+                alert('Not enough tokens!');
+            }
+        }
+
+        function displayBattlepass() {
+            const container = document.getElementById('battlepassContent');
+            container.innerHTML = '';
+
+            Object.entries(battlepassImages).forEach(([folder, images]) => {
+                images.forEach(image => {
+                    const imagePath = `images/${folder}/${image}`;
+                    const div = document.createElement('div');
+                    div.className = 'battlepass-item';
+
+                    const img = document.createElement('img');
+                    img.src = imagePath;
+                    img.alt = 'Battlepass Image';
+                    
+                    if (!viewedImages.includes(imagePath)) {
+                        img.className = 'locked';
+                        const button = document.createElement('button');
+                        button.textContent = 'Unlock (1 token)';
+                        button.className = 'unlock-button';
+                        button.onclick = () => unlockImage(imagePath);
+                        div.appendChild(button);
+                    }
+
+                    div.appendChild(img);
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // Initialize token display
+        updateTokenDisplay();
+    </script>
+</body>
+</html>

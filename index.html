@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        .image-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .image-display {
+            max-width: 100%;
+            height: auto;
+        }
+        .locked {
+            filter: blur(10px);
+            pointer-events: none;
+        }
+        #tokens {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+    <script src="scan_images.js"></script>
+</head>
+<body>
+    <div id="tokens">Tokens: <span id="tokenCount">0</span></div>
+    <div class="image-container">
+        <img id="currentImage" class="image-display" src="" alt="Random Image">
+        <button onclick="getNewImage()">Next Image</button>
+    </div>
+
+    <script>
+        let images = {};
+        let tokens = parseInt(localStorage.getItem('tokens')) || 0;
+        let viewedImages = JSON.parse(localStorage.getItem('viewedImages')) || [];
+
+        // Load images by scanning
+        getOrScanImages()
+            .then(data => {
+                images = data;
+                // Initialize after loading image data
+                getNewImage();
+            })
+            .catch(error => console.error('Error loading images:', error));
+
+        function updateTokenDisplay() {
+            document.getElementById('tokenCount').textContent = tokens;
+        }
+
+        function getNewImage() {
+            // Get random season and image
+            const seasons = Object.keys(images).filter(s => !s.endsWith('_battlepass'));
+            if (seasons.length === 0) {
+                console.error('No seasons found');
+                return;
+            }
+            
+            const season = seasons[Math.floor(Math.random() * seasons.length)];
+            const seasonImages = images[season];
+            if (!seasonImages || seasonImages.length === 0) {
+                console.error('No images found in season');
+                return;
+            }
+            
+            const image = seasonImages[Math.floor(Math.random() * seasonImages.length)];
+            const imagePath = `images/${season}/${image}`;
+            
+            // Check if image has been viewed
+            if (!viewedImages.includes(imagePath)) {
+                tokens++;
+                viewedImages.push(imagePath);
+                localStorage.setItem('tokens', tokens);
+                localStorage.setItem('viewedImages', JSON.stringify(viewedImages));
+                updateTokenDisplay();
+            }
+
+            document.getElementById('currentImage').src = imagePath;
+        }
+
+        // Initialize token display
+        updateTokenDisplay();
+    </script>
+</body>
+</html> 
