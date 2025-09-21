@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Collection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
     <style>
         .gallery {
             display: grid;
@@ -15,25 +17,131 @@
             width: 100%;
             height: auto;
         }
+        .season-counter {
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin: 1rem;
+            overflow: hidden;
+        }
+        .small-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            margin: 0.5rem;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
-    <div class="gallery" id="imageGallery"></div>
+  <nav class="navbar">
+      <div>
+        <a href="/index.html">Home</a>
+        <a href="/collection.html">Collection</a>
+        <a href="/battlepass.html">BattlePass</a>
+        <a href="/about.html">About</a>
+      </div>
+      <div>
+      Season 2
+      </div>
+    </nav>
+    <div id="seasonCounters"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
     <script>
         const viewedImages = JSON.parse(localStorage.getItem('viewedImages')) || [];
+        const totalImagesPerSeason = {
+            1: 52, 
+            2: 89  
+        };
+
+        function getSeasonFromPath(path) {
+            const match = path.match(/season(\d+)/);
+            return match ? parseInt(match[1], 10) : undefined;
+        }
 
         function displayCollection() {
-            const gallery = document.getElementById('imageGallery');
+            const seasonCounters = document.getElementById('seasonCounters');
+            const seasons = {};
+
             viewedImages.forEach(imagePath => {
+                if (!imagePath.includes('battlepass')) { // Exclude battlepass images
+                    const season = getSeasonFromPath(imagePath);
+                    if (!seasons[season]) {
+                        seasons[season] = [];
+                    }
+                    seasons[season].push(imagePath);
+                }
+            });
+
+            console.log('Viewed Images:', viewedImages);
+            console.log('Seasons:', seasons);
+
+            // Display season counters and images in order
+            [1, 2].forEach(season => {
+                const seasonDiv = document.createElement('div');
+                seasonDiv.className = 'season-counter small-card';
+                const viewedCount = seasons[season] ? seasons[season].length : 0;
+                seasonDiv.textContent = `Season ${season}: ${viewedCount} / ${totalImagesPerSeason[season]}`;
+                seasonCounters.appendChild(seasonDiv);
+
+                const galleryDiv = document.createElement('div');
+                galleryDiv.className = 'gallery';
+                seasonCounters.appendChild(galleryDiv);
+
+                if (seasons[season]) {
+                    seasons[season].forEach(imagePath => {
+                        console.log('Adding image:', imagePath); // Log each image path
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = 'card';
+                        const a = document.createElement('a');
+                        a.href = imagePath;
+                        a.setAttribute('data-lightbox', 'gallery');
+                        const img = document.createElement('img');
+                        img.src = imagePath;
+                        img.alt = 'Collection Image';
+                        a.appendChild(img);
+                        cardDiv.appendChild(a);
+                        galleryDiv.appendChild(cardDiv);
+                    });
+                }
+            });
+
+            // Display Season 2 Battle Pass images
+            const battlepassDiv = document.createElement('div');
+            battlepassDiv.className = 'season-counter small-card';
+            battlepassDiv.textContent = 'Season 2 Battle Pass';
+            seasonCounters.appendChild(battlepassDiv);
+
+            const battlepassGalleryDiv = document.createElement('div');
+            battlepassGalleryDiv.className = 'gallery';
+            seasonCounters.appendChild(battlepassGalleryDiv);
+
+            const battlepassImages = viewedImages.filter(imagePath => imagePath.includes('season2_battlepass'));
+            battlepassImages.forEach(imagePath => {
+                console.log('Adding battlepass image:', imagePath); // Log each image path
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card';
+                const a = document.createElement('a');
+                a.href = imagePath;
+                a.setAttribute('data-lightbox', 'gallery');
                 const img = document.createElement('img');
                 img.src = imagePath;
-                img.alt = 'Collection Image';
-                gallery.appendChild(img);
+                img.alt = 'Battlepass Image';
+                a.appendChild(img);
+                cardDiv.appendChild(a);
+                battlepassGalleryDiv.appendChild(cardDiv);
             });
         }
 
         displayCollection();
     </script>
 </body>
-</html> 
+</html>

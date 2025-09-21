@@ -4,30 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battle Pass</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
     <style>
         .battlepass-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjusted min-width */
+            gap: 0.5rem; /* Adjusted gap */
             padding: 1rem;
         }
         .battlepass-item {
             position: relative;
             text-align: center;
         }
+        .battlepass-item img {
+            width: 120%; /* Adjusted width to fit card */
+            height: auto;
+            border-radius: 8px; /* Match card border radius */
+        }
         .locked {
             filter: blur(10px);
         }
         .unlock-button {
             position: absolute;
-            bottom: 10px;
+            bottom: 5px; /* Adjusted position */
             left: 50%;
             transform: translateX(-50%);
+            font-size: 0.8rem; /* Adjusted font size */
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin: 1rem;
+            overflow: hidden; /* Ensure content fits within card */
         }
     </style>
     <script src="scan_images.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 </head>
 <body>
+  <nav class="navbar">
+      <div>
+        <a href="/index.html">Home</a>
+        <a href="/collection.html">Collection</a>
+        <a href="/battlepass.html">BattlePass</a>
+        <a href="/about.html">About</a>
+      </div>
+      <div>
+      Season 2
+      </div>
+    </nav>
+    <h1> Season 2 Battle Pass</h1>
     <div id="tokens">Tokens: <span id="tokenCount">0</span></div>
     <div class="battlepass-container" id="battlepassContent"></div>
 
@@ -73,7 +102,7 @@
                 images.forEach(image => {
                     const imagePath = `images/${folder}/${image}`;
                     const div = document.createElement('div');
-                    div.className = 'battlepass-item';
+                    div.className = 'battlepass-item card';
 
                     const img = document.createElement('img');
                     img.src = imagePath;
@@ -86,9 +115,15 @@
                         button.className = 'unlock-button';
                         button.onclick = () => unlockImage(imagePath);
                         div.appendChild(button);
+                        div.appendChild(img);
+                    } else {
+                        const a = document.createElement('a');
+                        a.href = imagePath;
+                        a.setAttribute('data-lightbox', 'battlepass-gallery');
+                        a.appendChild(img);
+                        div.appendChild(a);
                     }
 
-                    div.appendChild(img);
                     container.appendChild(div);
                 });
             });

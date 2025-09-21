@@ -3,86 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Gallery</title>
-    <style>
-        .image-container {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        .image-display {
-            max-width: 100%;
-            height: auto;
-        }
-        .locked {
-            filter: blur(10px);
-            pointer-events: none;
-        }
-        #tokens {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-        }
-    </style>
+    <title>Chicken Shawarma On Naan Salad Chilli Mint Hot</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="scan_images.js"></script>
 </head>
 <body>
-    <div id="tokens">Tokens: <span id="tokenCount">0</span></div>
-    <div class="image-container">
-        <img id="currentImage" class="image-display" src="" alt="Random Image">
+    <nav class="navbar">
+      <div>
+        <a href="/index.html">Home</a>
+        <a href="/collection.html">Collection</a>
+        <a href="/battlepass.html">BattlePass</a>
+        <a href="/about.html">About</a>
+      </div>
+      <div>
+      Season 2
+      </div>
+    </nav>
+    <div class="card">
+      <div class="image-display">
+        <img id="currentImage" src="" alt="Random Image">
         <button onclick="getNewImage()">Next Image</button>
+      </div>
     </div>
-
+    
     <script>
         let images = {};
         let tokens = parseInt(localStorage.getItem('tokens')) || 0;
         let viewedImages = JSON.parse(localStorage.getItem('viewedImages')) || [];
 
-        // Load images by scanning
-        getOrScanImages()
-            .then(data => {
-                images = data;
-                // Initialize after loading image data
-                getNewImage();
-            })
-            .catch(error => console.error('Error loading images:', error));
+        async function initialize() {
+            try {
+                images = await getOrScanImages();
+                console.log('Loaded images:', images); // Debugging: Check loaded images
+                getNewImage(); // Display the first image
+            } catch (error) {
+                console.error('Error initializing images:', error);
+            }
+        }
 
         function updateTokenDisplay() {
             document.getElementById('tokenCount').textContent = tokens;
         }
 
         function getNewImage() {
-            // Get random season and image
+            console.log('Images object:', images); // Debugging: Check images object
+        
             const seasons = Object.keys(images).filter(s => !s.endsWith('_battlepass'));
+            console.log('Seasons:', seasons); // Debugging: Check filtered seasons
+        
             if (seasons.length === 0) {
                 console.error('No seasons found');
                 return;
             }
-            
+        
             const season = seasons[Math.floor(Math.random() * seasons.length)];
+            console.log('Selected season:', season); // Debugging: Check selected season
+        
             const seasonImages = images[season];
+            console.log('Season images:', seasonImages); // Debugging: Check season images
+        
             if (!seasonImages || seasonImages.length === 0) {
-                console.error('No images found in season');
+                console.error(`No images found in season: ${season}`);
                 return;
             }
-            
+        
             const image = seasonImages[Math.floor(Math.random() * seasonImages.length)];
             const imagePath = `images/${season}/${image}`;
-            
-            // Check if image has been viewed
+            console.log('Displaying image path:', imagePath); // Debugging: Check image path
+        
             if (!viewedImages.includes(imagePath)) {
                 tokens++;
                 viewedImages.push(imagePath);
                 localStorage.setItem('tokens', tokens);
                 localStorage.setItem('viewedImages', JSON.stringify(viewedImages));
-                updateTokenDisplay();
+            //    updateTokenDisplay();
             }
-
+        
             document.getElementById('currentImage').src = imagePath;
         }
 
-        // Initialize token display
-        updateTokenDisplay();
+        // Clear cached data for debugging
+        //localStorage.clear();
+
+        // Initialize the gallery
+        initialize();
     </script>
 </body>
-</html> 
+</html>

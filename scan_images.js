@@ -1,75 +1,17 @@
 async function scanImages() {
+
     const images = {};
-    
-    // Define your content folders
-    const contentFolders = {
-        seasons: ['season1', 'season2', 'season3'], // Add your seasons
-        events: ['halloween', 'christmas', 'summer'] // Add your events
-    };
-    
-    const extensions = ['jpg', 'jpeg', 'png', 'gif'];
-    const maxImagesPerFolder = 100; // Adjust based on your needs
-
-    // Scan season folders
-    for (const season of contentFolders.seasons) {
-        // Regular season folder
-        images[season] = [];
-        // Battlepass folder
-        images[`${season}_battlepass`] = [];
-
-        // Scan both regular and battlepass folders
-        for (const folder of [season, `${season}_battlepass`]) {
-            // Try images with different extensions and numbers
-            for (let i = 1; i <= maxImagesPerFolder; i++) {
-                for (const ext of extensions) {
-                    const imagePath = `images/${folder}/image${i}.${ext}`;
-                    try {
-                        const response = await fetch(imagePath, { method: 'HEAD' });
-                        if (response.ok) {
-                            images[folder].push(`image${i}.${ext}`);
-                        }
-                    } catch (error) {
-                        continue;
-                    }
-                }
-            }
+    try {
+        const response = await fetch('manifest.json');
+        if (response.ok) {
+            const manifest = await response.json();
+            Object.assign(images, manifest);
+        } else {
+            console.error('Failed to load manifest.json');
         }
-
-        // Remove empty folders
-        if (images[season].length === 0) delete images[season];
-        if (images[`${season}_battlepass`].length === 0) delete images[`${season}_battlepass`];
+    } catch (error) {
+        console.error('Error fetching manifest:', error);
     }
-
-    // Scan event folders
-    for (const event of contentFolders.events) {
-        // Regular event folder
-        images[event] = [];
-        // Event battlepass folder (if you have event battlepasses)
-        images[`${event}_battlepass`] = [];
-
-        // Scan both regular and battlepass folders
-        for (const folder of [event, `${event}_battlepass`]) {
-            // Try images with different extensions and numbers
-            for (let i = 1; i <= maxImagesPerFolder; i++) {
-                for (const ext of extensions) {
-                    const imagePath = `images/${folder}/image${i}.${ext}`;
-                    try {
-                        const response = await fetch(imagePath, { method: 'HEAD' });
-                        if (response.ok) {
-                            images[folder].push(`image${i}.${ext}`);
-                        }
-                    } catch (error) {
-                        continue;
-                    }
-                }
-            }
-        }
-
-        // Remove empty folders
-        if (images[event].length === 0) delete images[event];
-        if (images[`${event}_battlepass`].length === 0) delete images[`${event}_battlepass`];
-    }
-
     return images;
 }
 
@@ -81,7 +23,7 @@ function isBattlepassFolder(folder) {
 // Helper function to check if a folder is an event
 function isEventFolder(folder) {
     const contentFolders = {
-        events: ['halloween', 'christmas', 'summer'] // Keep in sync with the events array above
+        events: ['halloween', 'christmas_2024', 'summer'] // Keep in sync with the events array above
     };
     return contentFolders.events.includes(folder) || 
            contentFolders.events.some(event => folder === `${event}_battlepass`);
@@ -91,12 +33,25 @@ function isEventFolder(folder) {
 async function getOrScanImages() {
     const cachedImages = localStorage.getItem('scannedImages');
     if (cachedImages) {
+        console.log('Loaded images from cache:', JSON.parse(cachedImages)); // Debugging: Check cached data
         return JSON.parse(cachedImages);
     }
 
-    const images = await scanImages();
-    localStorage.setItem('scannedImages', JSON.stringify(images));
-    return images;
+    try {
+        const response = await fetch('manifest.json');
+        if (response.ok) {
+            const manifest = await response.json();
+            console.log('Loaded manifest.json:', manifest); // Debugging: Check fetched manifest
+            localStorage.setItem('scannedImages', JSON.stringify(manifest));
+            return manifest;
+        } else {
+            console.error('Failed to load manifest.json, status:', response.status);
+        }
+    } catch (error) {
+        console.error('Error fetching manifest.json:', error);
+    }
+
+    return {}; // Return empty object if fetching fails
 }
 
 // Helper function to get active content folders (non-battlepass)
