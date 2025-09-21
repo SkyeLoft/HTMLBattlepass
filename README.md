@@ -9,8 +9,8 @@ HTMLBattlepass is a tiny, front-end-only "battlepass" for images. Visitors click
 This repo is the cleaned-up version — the concept survived; the target remains optional.
 
 ## Demo
-~~There is a live site @ (https://chickenshawarmaonnaansaladchilliminthot.com)~~
-There is an archive version @ (https://chickenshawarmaonnaan.neocities.org/)
+~~There is a live site @ (https://chickenshawarmaonnaansaladchilliminthot.com)~~  
+There is an archive version @ (https://chickenshawarmaonnaan.neocities.org)
 ## Honest intent
 
 I built this to mock someone. It’s satirical gamification: coax people into doing tiny, pointless work to see a photo that proves nothing. It’s funny, a little mean, and entirely under your control.
