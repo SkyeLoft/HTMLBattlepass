@@ -29,7 +29,7 @@ I built this to mock someone. It’s satirical gamification: coax people into do
 
 ## Quick setup
 
-1. Edit assets/ with your images and update config.json to set prices and rewards.
+1. Edit assets/ with your images and update mainifest.json to set prices and rewards.
 2. Change the copy to name the joke, the target, or keep it anonymous.
 3. Deploy index.html to a static host and share the link with the intended victims.
 4. Optional: add smug sound effects, a dramatic modal for the “final reveal,” or a faux achievement system.
