@@ -1,12 +1,12 @@
 # HTMLBattlepass
 
-A petty little static site that turns a gallery into an escalating prank. Calm language, unhinged purpose: this exists because I wanted to take the mick out of someone, so I made the internet do it for me.
+A little static site that turns a gallery into an escalating prank. This exists because I wanted to take the mick out of someone.
 
 ## What it is
 
-HTMLBattlepass is a tiny, front-end-only "battlepass" for images. Visitors click, swipe, or begrudgingly tap through pictures, earn tokens, and burn those tokens to unlock the next, marginally different image. No accounts, no server, just localStorage and decreasing dignity.
+HTMLBattlepass is a tiny, front-end-only "battlepass" for images. Visitors click, swipe, or begrudgingly tap through pictures, earn tokens, and burn those tokens to unlock the next, marginally different image.
 
-This repo is the cleaned-up version — the concept survived; the target remains optional.
+This repo is the cleaned-up version — the concept survived, if even only just.
 
 ## Demo
 ~~There is a live site @ (https://chickenshawarmaonnaansaladchilliminthot.com)~~  
@@ -17,9 +17,9 @@ I built this to mock someone. It’s satirical gamification: coax people into do
 
 ## Use cases
 
-- Publicly roast a friend by forcing fans to grind for the “ultimate” embarrassing image.
+- Publicly roast a friend by forcing them to grind.
 - Make a gag microsite for a meme, product parody, or inside joke.
-- Demonstrate basic gamification mechanics with a darkly comic twist.
+- Demonstrate basic gamification mechanics with a comedic twist.
 - Create a shrine to something mundane and make strangers pay in clicks.
 
 ## Features
@@ -32,17 +32,16 @@ I built this to mock someone. It’s satirical gamification: coax people into do
 
 ## Quick setup
 
-1. Edit assets/ with your images and update mainifest.json to set prices and rewards.
+1. Edit assets/ with your images and update manifest.json to set prices and rewards.
 2. Change the copy to name the joke, the target, or keep it anonymous.
-3. Deploy index.html to a static host and share the link with the intended victims.
-4. Optional: add smug sound effects, a dramatic modal for the “final reveal,” or a faux achievement system.
+3. Deploy the pages to a static host and share the link with the intended victims.
 
-## Customization ideas
+## Customisation ideas
 
 - Make unlock costs painfully slow so people have to grind like it’s a bad mobile game.
 - Add absurd achievements (e.g., "Clicked 100 times for no reason") and mock congratulatory copy.
 - Lazy-load the top-tier photos and reveal them with a dramatic, mock-epic animation.
-- Add a tiny leaderboard stored locally — let the prank become competitive.
+- Add a tiny leaderboard with fake users — let the prank become competitive.
 
 ## Implementation notes
 
@@ -50,6 +49,5 @@ I built this to mock someone. It’s satirical gamification: coax people into do
 - Keep images small; lazy-load higher tiers to avoid massive downloads.
 - Store gallery data in JSON so anyone can edit the prank without touching JS.
 
-## License
-
-Do what you want. Attribution optional. If you deploy this to publicly roast someone, be a decent human about it — don’t dox, don’t harass, and keep consent in mind.
+## Note
+ If you deploy this to publicly roast someone, be a decent human about it, and keep consent in mind.
